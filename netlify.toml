@@ -4,3 +4,8 @@
 
 [functions]
   directory = "netlify/functions"
+
+[[redirects]]
+  from = "/api/juice"
+  to = "/.netlify/functions/juice"
+  status = 200
