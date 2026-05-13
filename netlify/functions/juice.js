@@ -1,19 +1,20 @@
-export default async (req) => {
-  const { mood } = await req.json();
+exports.handler = async (event) => {
+  try {
+    const { mood } = JSON.parse(event.body);
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": process.env.ANTHROPIC_API_KEY,
-      "anthropic-version": "2023-06-01"
-    },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1000,
-      messages: [{
-        role: "user",
-        content: `Someone is feeling: "${mood}".
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        messages: [{
+          role: "user",
+          content: `Someone is feeling: "${mood}".
 
 You are a chaotic, deeply intuitive juice bar that understands every human emotion — from obvious ones like happy or sad, to complex ones like superstitious, nostalgic, restless, overstimulated, or "that specific sunday afternoon feeling". No feeling is too weird or niche for you.
 
@@ -28,12 +29,20 @@ Respond ONLY with valid JSON, no extra text, no markdown:
   "description": "one funny sentence about why this juice fits the mood",
   "quote": "a quote that actually hits for this specific feeling"
 }`
-      }]
-    })
-  });
+        }]
+      })
+    });
 
-  const data = await response.json();
-  return Response.json(data);
+    const data = await response.json();
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify(data)
+    };
+  } catch (err) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: err.message })
+    };
+  }
 };
-
-export const config = { path: "/api/juice" };
