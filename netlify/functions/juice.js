@@ -34,12 +34,14 @@ Respond ONLY with valid JSON, no extra text, no markdown:
     });
 
     const data = await response.json();
+    console.log("API response:", JSON.stringify(data));
 
     return {
       statusCode: 200,
       body: JSON.stringify(data)
     };
   } catch (err) {
+    console.log("Error:", err.message);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: err.message })
