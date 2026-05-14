@@ -1,10 +1,10 @@
-const Anthropic = require("@anthropic-ai/sdk");
+import Anthropic from "@anthropic-ai/sdk";
 
-exports.handler = async (event) => {
+export const handler = async (event) => {
   try {
     const { mood } = JSON.parse(event.body);
 
-    const client = new Anthropic.default({
+    const client = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
     });
 
@@ -30,8 +30,6 @@ Respond ONLY with valid JSON, no extra text, no markdown:
 }`
       }]
     });
-
-    console.log("success!", JSON.stringify(message));
 
     return {
       statusCode: 200,
