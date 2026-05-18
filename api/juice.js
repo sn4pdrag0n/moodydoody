@@ -1,15 +1,18 @@
-
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 
 export default async function handler(req, res) {
   try {
     const { mood } = req.body;
 
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-1.5-flash",}, { 
-      apiVersion: "v1" });
-    const prompt = `Someone is feeling: "${mood}".
+    const groq = new Groq({
+      apiKey: process.env.website,
+    });
+
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [{
+        role: "user",
+        content: `Someone is feeling: "${mood}".
 
 You are a chaotic, deeply intuitive juice bar that understands every human emotion — from obvious ones like happy or sad, to complex ones like superstitious, nostalgic, restless, overstimulated, or "that specific sunday afternoon feeling". No feeling is too weird or niche for you.
 
@@ -23,11 +26,12 @@ Respond ONLY with valid JSON, no extra text, no markdown:
   "ingredients": ["ingredient 1", "ingredient 2", "ingredient 3", "ingredient 4"],
   "description": "one funny sentence about why this juice fits the mood",
   "quote": "a quote that actually hits for this specific feeling"
-}`;
+}`
+      }],
+      max_tokens: 1000,
+    });
 
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
-
+    const text = completion.choices[0].message.content;
     res.status(200).json({ content: [{ text }] });
   } catch (err) {
     console.log("Error:", err.message);
