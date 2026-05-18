@@ -3,6 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 
 export const handler = async (event) => {
   try {
+    console.log("key starts with:", process.env.ANTHROPIC_API_KEY?.slice(0, 10));
     const { mood } = JSON.parse(event.body);
 
     const client = new Anthropic({
