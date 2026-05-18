@@ -1,19 +1,13 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default async function handler(req, res) {
   try {
     const { mood } = req.body;
 
-    const client = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    });
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const message = await client.messages.create({
-      model: "claude-sonnet-4-5",
-      max_tokens: 1000,
-      messages: [{
-        role: "user",
-        content: `Someone is feeling: "${mood}".
+    const prompt = `Someone is feeling: "${mood}".
 
 You are a chaotic, deeply intuitive juice bar that understands every human emotion — from obvious ones like happy or sad, to complex ones like superstitious, nostalgic, restless, overstimulated, or "that specific sunday afternoon feeling". No feeling is too weird or niche for you.
 
@@ -27,11 +21,12 @@ Respond ONLY with valid JSON, no extra text, no markdown:
   "ingredients": ["ingredient 1", "ingredient 2", "ingredient 3", "ingredient 4"],
   "description": "one funny sentence about why this juice fits the mood",
   "quote": "a quote that actually hits for this specific feeling"
-}`
-      }]
-    });
+}`;
 
-    res.status(200).json(message);
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+
+    res.status(200).json({ content: [{ text }] });
   } catch (err) {
     console.log("Error:", err.message);
     res.status(500).json({ error: err.message });
