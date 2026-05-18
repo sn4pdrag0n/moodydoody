@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     const { mood } = req.body;
 
     const groq = new Groq({
-      apiKey: process.env.website,
+      apiKey: process.env.GROQ_API_KEY,
     });
 
     const completion = await groq.chat.completions.create({
