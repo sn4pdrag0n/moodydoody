@@ -1,9 +1,8 @@
-// v3
 import Anthropic from "@anthropic-ai/sdk";
 
-export const handler = async (event) => {
+export default async function handler(req, res) {
   try {
-    const { mood } = JSON.parse(event.body);
+    const { mood } = req.body;
 
     const client = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
@@ -32,15 +31,9 @@ Respond ONLY with valid JSON, no extra text, no markdown:
       }]
     });
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify(message)
-    };
+    res.status(200).json(message);
   } catch (err) {
     console.log("Error:", err.message);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message })
-    };
+    res.status(500).json({ error: err.message });
   }
-};
+}
