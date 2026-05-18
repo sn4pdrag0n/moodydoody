@@ -161,7 +161,7 @@ export default function MoodyJuice() {
       const data = await response.json();
       const text = data.content[0].text.trim();
       console.log("got this:", text);
-      const clean = text.replace(/```json|```/g, "").trim();
+      const clean = text.replace(/```json|```|`/g, "").trim();
       const parsed = JSON.parse(clean);
       setResult(parsed);
     } catch (err) {
